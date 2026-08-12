@@ -1,0 +1,27 @@
+{
+  "name": "marketing-ai",
+  "version": "1.0.0",
+  "description": "Marketing IA Assistente - Chatbot de estratégias de marketing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "marketing",
+    "ia",
+    "chatbot",
+    "gemini",
+    "marketing-digital"
+  ],
+  "author": "Projeto TCC",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@google/genai": "^2.15.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jspdf": "^4.2.1",
+    "openai": "^7.1.0"
+  }
+}
