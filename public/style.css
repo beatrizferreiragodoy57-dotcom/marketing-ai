@@ -1232,3 +1232,147 @@ body.dark #mensagem:focus {
             70px;
     }
 }
+/* ==================================================
+   MELHORIAS DO CHAT — PASSO 2
+   ================================================== */
+
+/* Área de resposta da IA */
+.resposta-ia {
+    position: relative;
+}
+
+/* Cabeçalho da IA */
+.cabecalho-ia {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Conteúdo da resposta */
+.conteudo-resposta {
+    margin-top: 14px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Área dos botões da resposta */
+.acoes-resposta {
+    display: flex;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(100, 100, 100, 0.12);
+}
+
+/* Botão copiar */
+.botao-copiar {
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+/* Efeito ao passar o mouse */
+.botao-copiar:hover {
+    background: rgba(79, 70, 229, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Indicador "Pensando" */
+.indicador-pensando {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+/* Bolinhas animadas */
+.indicador-pensando > span:not(.texto-pensando) {
+    animation: pensando 1.4s infinite ease-in-out;
+    opacity: 0.35;
+}
+
+.indicador-pensando > span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.indicador-pensando > span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Texto Pensando */
+.texto-pensando {
+    margin-left: 5px;
+}
+
+/* Animação */
+@keyframes pensando {
+
+    0%,
+    60%,
+    100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+
+}
+
+
+/* ==================================================
+   BOTÃO TENTAR NOVAMENTE
+   ================================================== */
+
+.botao-tentar-novamente {
+    border: none;
+    padding: 9px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.botao-tentar-novamente:hover {
+    transform: translateY(-1px);
+}
+
+
+/* ==================================================
+   MODO ESCURO
+   ================================================== */
+
+body.dark .acoes-resposta {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .botao-copiar:hover {
+    background: rgba(129, 140, 248, 0.15);
+}
+
+
+/* ==================================================
+   CELULAR
+   ================================================== */
+
+@media (max-width: 800px) {
+
+    .acoes-resposta {
+        margin-top: 10px;
+    }
+
+    .botao-copiar {
+        font-size: 12px;
+    }
+
+    .conteudo-resposta {
+        line-height: 1.6;
+    }
+
+}
