@@ -5,47 +5,30 @@ import { GoogleGenAI } from "@google/genai";
 dotenv.config();
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-
-// Permite acessar os arquivos do site
 app.use(express.static("public"));
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY
 });
 
-// ========================================
-// TESTE DO SERVIDOR
-// ========================================
-
 app.get("/health", (req, res) => {
-
     res.json({
         status: "online",
         mensagem: "Marketing IA Assistente está funcionando!"
     });
-
 });
 
-// ========================================
-// CHAT
-// ========================================
-
 app.post("/chat", async (req, res) => {
-
     try {
-
         const { pergunta } = req.body;
 
         if (!pergunta || !pergunta.trim()) {
-
             return res.status(400).json({
                 resposta: "Digite uma pergunta para começar."
             });
-
         }
 
         const prompt = `
@@ -90,43 +73,53 @@ ${pergunta}
 Responda agora de forma útil e profissional.
 `;
 
-        const resposta = await ai.models.generateContent({
+        let resposta;
 
-            model: "gemini-3.6-flash",
+        const maxTentativas = 3;
 
-            contents: prompt
+        for (let tentativa = 1; tentativa <= maxTentativas; tentativa++) {
+            try {
+                resposta = await ai.models.generateContent({
+                    model: "gemini-3.6-flash",
+                    contents: prompt
+                });
 
-        });
+                break;
+
+            } catch (erro) {
+                console.error(
+                    `Tentativa ${tentativa} falhou:`,
+                    erro
+                );
+
+                if (tentativa === maxTentativas) {
+                    throw erro;
+                }
+
+                const espera = tentativa * 2000;
+
+                await new Promise(resolve =>
+                    setTimeout(resolve, espera)
+                );
+            }
+        }
 
         res.json({
-
             resposta: resposta.text
-
         });
 
     } catch (erro) {
-
         console.error("Erro no Gemini:", erro);
 
         res.status(500).json({
-
             resposta:
-                "Desculpe, ocorreu um erro ao conversar com o Marketing IA Assistente. Tente novamente."
-
+                "Desculpe, o Gemini está temporariamente ocupado. Tente novamente em alguns segundos."
         });
-
     }
-
 });
 
-// ========================================
-// INICIAR SERVIDOR
-// ========================================
-
 app.listen(PORT, "0.0.0.0", () => {
-
     console.log(
         `🚀 Marketing IA Assistente rodando na porta ${PORT}`
     );
-
 });
