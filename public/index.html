@@ -5,7 +5,13 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="MARKETING IA ASSISTENTE — Inteligência Artificial para estratégias de marketing">
 
     <title>MARKETING IA ASSISTENTE</title>
 
@@ -13,162 +19,303 @@
 
 </head>
 
+
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <!-- =========================
-             CABEÇALHO
-        ========================== -->
 
-        <header class="topo">
+    <!-- ==================================================
+         CABEÇALHO
+    ================================================== -->
 
-            <h1>🤖 MARKETING IA ASSISTENTE</h1>
+    <header class="topo">
 
-            <p>
-                Inteligência Artificial para criar estratégias de marketing
-            </p>
+        <div class="marca">
 
-            <div class="menu">
+            <div class="logo-ia">
+                🤖
+            </div>
 
-                <button id="novaConversa">
-                    ➕ Nova Conversa
+            <div>
+
+                <h1>
+                    MARKETING IA ASSISTENTE
+                </h1>
+
+                <p>
+                    Inteligência Artificial para criar estratégias de marketing
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu">
+
+            <button id="novaConversa">
+                ➕ Nova Conversa
+            </button>
+
+            <button id="exportarPDF">
+                📄 Exportar PDF
+            </button>
+
+            <button id="limparHistorico">
+                🗑️ Limpar Histórico
+            </button>
+
+            <button id="modoEscuro">
+                🌙 Modo Escuro
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- ==================================================
+         ÁREA PRINCIPAL
+    ================================================== -->
+
+    <main class="principal">
+
+
+        <!-- ==================================================
+             HISTÓRICO
+        ================================================== -->
+
+        <aside class="historico">
+
+            <div class="historico-titulo">
+
+                <span>💬</span>
+
+                <strong>
+                    Histórico
+                </strong>
+
+            </div>
+
+
+            <button
+                class="botao-historico"
+                id="novaConversaLateral">
+
+                ➕ Nova Conversa
+
+            </button>
+
+
+            <div
+                id="listaHistorico"
+                class="lista-historico">
+
+            </div>
+
+        </aside>
+
+
+
+        <!-- ==================================================
+             CHAT
+        ================================================== -->
+
+        <section class="area-chat">
+
+
+            <!-- ==================================================
+                 BARRA SUPERIOR DO CHAT
+            ================================================== -->
+
+            <div class="barra-chat">
+
+                <div>
+
+                    <strong>
+                        🤖 Assistente de Marketing
+                    </strong>
+
+                    <span>
+                        ● Online
+                    </span>
+
+                </div>
+
+                <small>
+                    Especialista em estratégias de marketing
+                </small>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 MENSAGENS
+            ================================================== -->
+
+            <div id="chat"></div>
+
+
+
+            <!-- ==================================================
+                 ATALHOS
+            ================================================== -->
+
+            <div class="atalhos-titulo">
+                <span>✨</span>
+                <strong>Comece rapidamente</strong>
+            </div>
+
+
+            <div class="atalhos">
+
+                <button
+                    class="atalho"
+                    data-tipo="swot">
+
+                    <span>📊</span>
+
+                    <div>
+                        <strong>Análise SWOT</strong>
+                        <small>Analise seu negócio</small>
+                    </div>
+
                 </button>
 
-                <button id="exportarPDF">
-                    📄 Exportar PDF
+
+                <button
+                    class="atalho"
+                    data-tipo="persona">
+
+                    <span>👤</span>
+
+                    <div>
+                        <strong>Criar Persona</strong>
+                        <small>Conheça seu cliente</small>
+                    </div>
+
                 </button>
 
-                <button id="modoEscuro">
-                    🌙 Modo Escuro
+
+                <button
+                    class="atalho"
+                    data-tipo="plano">
+
+                    <span>📈</span>
+
+                    <div>
+                        <strong>Plano de Marketing</strong>
+                        <small>Crie sua estratégia</small>
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="atalho"
+                    data-tipo="redes">
+
+                    <span>📱</span>
+
+                    <div>
+                        <strong>Redes Sociais</strong>
+                        <small>Planeje seus conteúdos</small>
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="atalho"
+                    data-tipo="calendario">
+
+                    <span>📅</span>
+
+                    <div>
+                        <strong>Calendário</strong>
+                        <small>30 dias de conteúdo</small>
+                    </div>
+
+                </button>
+
+
+                <button
+                    class="atalho"
+                    data-tipo="campanha">
+
+                    <span>🎯</span>
+
+                    <div>
+                        <strong>Campanha</strong>
+                        <small>Crie uma campanha</small>
+                    </div>
+
                 </button>
 
             </div>
 
-        </header>
 
 
-        <!-- =========================
-             ÁREA PRINCIPAL
-        ========================== -->
+            <!-- ==================================================
+                 CAMPO DE MENSAGEM
+            ================================================== -->
 
-        <main class="principal">
+            <div class="input-area">
 
+                <div class="campo-mensagem">
 
-            <!-- =========================
-                 HISTÓRICO
-            ========================== -->
+                    <textarea
+                        id="mensagem"
+                        rows="1"
+                        autocomplete="off"
+                        placeholder="Digite sua pergunta sobre marketing..."></textarea>
 
-            <aside class="historico">
-
-                <div class="historico-titulo">
-
-                    <span>💬</span>
-
-                    <strong>Histórico</strong>
+                    <small>
+                        Enter para enviar • Shift + Enter para nova linha
+                    </small>
 
                 </div>
 
 
-                <button
-                    class="botao-historico"
-                    id="novaConversaLateral">
+                <button id="enviar">
 
-                    ➕ Nova Conversa
+                    <span class="texto-enviar">
+                        Enviar
+                    </span>
+
+                    <span class="icone-enviar">
+                        ➤
+                    </span>
 
                 </button>
 
+            </div>
 
-                <div
-                    id="listaHistorico"
-                    class="lista-historico">
+        </section>
 
-                </div>
+    </main>
 
-            </aside>
-
-
-            <!-- =========================
-                 ÁREA DO CHAT
-            ========================== -->
-
-            <section class="area-chat">
-
-                <div id="chat"></div>
+</div>
 
 
-                <!-- =========================
-                     ATALHOS
-                ========================== -->
 
-                <div class="atalhos">
+<!-- ==================================================
+     BIBLIOTECA PDF
+================================================== -->
 
-                    <button class="atalho">
-                        📊 Análise SWOT
-                    </button>
-
-                    <button class="atalho">
-                        👤 Criar Persona
-                    </button>
-
-                    <button class="atalho">
-                        📈 Plano de Marketing
-                    </button>
-
-                    <button class="atalho">
-                        📱 Redes Sociais
-                    </button>
-
-                    <button class="atalho">
-                        📅 Calendário
-                    </button>
-
-                    <button class="atalho">
-                        🎯 Campanha
-                    </button>
-
-                </div>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+</script>
 
 
-                <!-- =========================
-                     CAMPO DE MENSAGEM
-                ========================== -->
+<!-- ==================================================
+     JAVASCRIPT
+================================================== -->
 
-                <div class="input-area">
-
-                    <input
-                        id="mensagem"
-                        type="text"
-                        autocomplete="off"
-                        placeholder="Digite sua pergunta sobre marketing...">
-
-                    <button id="enviar">
-                        Enviar
-                    </button>
-
-                </div>
-
-            </section>
-
-        </main>
-
-    </div>
-
-
-    <!-- =========================
-         BIBLIOTECA PDF
-    ========================== -->
-
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-    </script>
-
-
-    <!-- =========================
-         JAVASCRIPT DO PROJETO
-    ========================== -->
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 
