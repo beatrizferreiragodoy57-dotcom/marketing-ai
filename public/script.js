@@ -1,31 +1,54 @@
 // ==================================================
+// MARKETING IA ASSISTENTE
+// JAVASCRIPT — VERSÃO COMPLETA
+// ==================================================
+
+
+// ==================================================
 // ELEMENTOS
 // ==================================================
 
-const botao = document.getElementById("enviar");
-const chat = document.getElementById("chat");
-const mensagem = document.getElementById("mensagem");
-const listaHistorico = document.getElementById("listaHistorico");
-const novaConversa = document.getElementById("novaConversa");
-const novaConversaLateral = document.getElementById("novaConversaLateral");
-const modoEscuro = document.getElementById("modoEscuro");
-const botaoPDF = document.getElementById("exportarPDF");
+const botao =
+    document.getElementById("enviar");
+
+const chat =
+    document.getElementById("chat");
+
+const mensagem =
+    document.getElementById("mensagem");
+
+const listaHistorico =
+    document.getElementById("listaHistorico");
+
+const novaConversa =
+    document.getElementById("novaConversa");
+
+const novaConversaLateral =
+    document.getElementById("novaConversaLateral");
+
+const modoEscuro =
+    document.getElementById("modoEscuro");
+
+const botaoPDF =
+    document.getElementById("exportarPDF");
+
+const limparHistorico =
+    document.getElementById("limparHistorico");
 
 
 // ==================================================
-// HISTÓRICO
+// ESTADO
 // ==================================================
 
 let conversas = [];
+
 let conversaAtual = -1;
 
-// Guarda a última mensagem enviada.
-// É usada pelo botão "Tentar novamente".
 let ultimaMensagem = "";
 
 
 // ==================================================
-// SALVAR HISTÓRICO NO NAVEGADOR
+// SALVAR
 // ==================================================
 
 function salvarHistoricoLocal() {
@@ -39,33 +62,310 @@ function salvarHistoricoLocal() {
 
 
 // ==================================================
+// ESCAPAR HTML
+// ==================================================
+
+function escaparHTML(texto) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        texto ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+// ==================================================
+// FORMATAR RESPOSTA DA IA
+// ==================================================
+
+function formatarResposta(texto) {
+
+    const seguro =
+        escaparHTML(texto);
+
+    const linhas =
+        seguro.split("\n");
+
+    let html = "";
+
+    let listaAberta = false;
+
+    linhas.forEach((linha) => {
+
+        const limpa =
+            linha.trim();
+
+
+        // Lista
+        if (
+            limpa.startsWith("- ") ||
+            limpa.startsWith("• ") ||
+            /^\d+\.\s/.test(limpa)
+        ) {
+
+            if (!listaAberta) {
+
+                html += "<ul>";
+
+                listaAberta = true;
+
+            }
+
+            let item =
+                limpa
+                    .replace(/^-\s+/, "")
+                    .replace(/^•\s+/, "")
+                    .replace(/^\d+\.\s+/, "");
+
+            item =
+                destacarTexto(item);
+
+            html +=
+                `<li>${item}</li>`;
+
+            return;
+
+        }
+
+
+        if (listaAberta) {
+
+            html += "</ul>";
+
+            listaAberta = false;
+
+        }
+
+
+        // Linha vazia
+        if (!limpa) {
+
+            html += "<br>";
+
+            return;
+
+        }
+
+
+        // Títulos
+        if (
+            limpa.endsWith(":") &&
+            limpa.length < 90
+        ) {
+
+            html +=
+                `<h3>${destacarTexto(limpa)}</h3>`;
+
+            return;
+
+        }
+
+
+        html +=
+            `<p>${destacarTexto(limpa)}</p>`;
+
+    });
+
+
+    if (listaAberta) {
+
+        html += "</ul>";
+
+    }
+
+
+    return html;
+
+}
+
+
+// ==================================================
+// DESTAQUES
+// ==================================================
+
+function destacarTexto(texto) {
+
+    return texto.replace(
+        /\*\*(.*?)\*\*/g,
+        "<strong>$1</strong>"
+    );
+
+}
+
+
+// ==================================================
+// MENSAGEM INICIAL
+// ==================================================
+
+function mensagemInicialHTML() {
+
+    return `
+
+        <div class="boas-vindas">
+
+            <div class="icone-boas-vindas">
+                🤖
+            </div>
+
+            <h2>
+                Olá! 👋
+            </h2>
+
+            <p>
+                Eu sou o <strong>MARKETING IA ASSISTENTE</strong>.
+                Posso ajudar você a criar estratégias,
+                campanhas e planos de marketing.
+            </p>
+
+            <div class="beneficios">
+
+                <div class="beneficio">
+
+                    <strong>
+                        📊 Estratégia
+                    </strong>
+
+                    <small>
+                        SWOT e planejamento
+                    </small>
+
+                </div>
+
+
+                <div class="beneficio">
+
+                    <strong>
+                        👤 Público
+                    </strong>
+
+                    <small>
+                        Personas e clientes
+                    </small>
+
+                </div>
+
+
+                <div class="beneficio">
+
+                    <strong>
+                        🚀 Crescimento
+                    </strong>
+
+                    <small>
+                        Campanhas e vendas
+                    </small>
+
+                </div>
+
+            </div>
+
+            <p style="margin-top:20px;">
+                Escolha uma opção abaixo ou
+                digite sua pergunta.
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+// ==================================================
+// NOVA CONVERSA
+// ==================================================
+
+function iniciarNovaConversa() {
+
+    chat.innerHTML =
+        mensagemInicialHTML();
+
+    ultimaMensagem = "";
+
+    conversas.push({
+
+        titulo:
+            "🆕 Nova Conversa",
+
+        html:
+            chat.innerHTML,
+
+        mensagens:
+            []
+
+    });
+
+    conversaAtual =
+        conversas.length - 1;
+
+    salvarHistoricoLocal();
+
+    atualizarHistorico();
+
+}
+
+
+// ==================================================
 // CARREGAR HISTÓRICO
 // ==================================================
 
 function carregarHistorico() {
 
     const salvo =
-        localStorage.getItem("marketingConversas");
+        localStorage.getItem(
+            "marketingConversas"
+        );
+
 
     if (!salvo) {
 
         iniciarNovaConversa();
 
         return;
+
     }
+
 
     try {
 
-        conversas = JSON.parse(salvo);
+        conversas =
+            JSON.parse(salvo);
 
-        if (!Array.isArray(conversas) || conversas.length === 0) {
+
+        if (
+            !Array.isArray(conversas) ||
+            conversas.length === 0
+        ) {
 
             iniciarNovaConversa();
 
             return;
+
         }
 
-        conversaAtual = 0;
+
+        // Compatibilidade com histórico antigo
+
+        conversas =
+            conversas.map((conversa) => {
+
+                if (!conversa.mensagens) {
+
+                    conversa.mensagens = [];
+
+                }
+
+                return conversa;
+
+            });
+
+
+        conversaAtual =
+            0;
 
         chat.innerHTML =
             conversas[0].html;
@@ -73,6 +373,7 @@ function carregarHistorico() {
         atualizarHistorico();
 
     }
+
 
     catch (erro) {
 
@@ -91,169 +392,98 @@ function carregarHistorico() {
 
 
 // ==================================================
-// MENSAGEM INICIAL
-// ==================================================
-
-function mensagemInicialHTML() {
-
-    return `
-
-        <div class="ia">
-
-            <strong>🤖 Gemini</strong>
-
-            <br><br>
-
-            Olá! 👋
-
-            <br><br>
-
-            Bem-vinda ao
-            <strong>MARKETING IA ASSISTENTE</strong>.
-
-            <br><br>
-
-            Sou uma Inteligência Artificial
-            especializada em estratégias de marketing.
-
-            <br><br>
-
-            Posso ajudar você com:
-
-            <br><br>
-
-            ✅ Plano de Marketing<br>
-            ✅ Análise SWOT<br>
-            ✅ Persona<br>
-            ✅ Campanhas Publicitárias<br>
-            ✅ Redes Sociais<br>
-            ✅ Calendário de Conteúdo
-
-            <br><br>
-
-            Escolha uma das opções abaixo
-            ou envie sua pergunta.
-
-        </div>
-
-    `;
-
-}
-
-
-// ==================================================
-// INICIAR NOVA CONVERSA
-// ==================================================
-
-function iniciarNovaConversa() {
-
-    chat.innerHTML =
-        mensagemInicialHTML();
-
-    ultimaMensagem = "";
-
-    conversas.push({
-
-        titulo: "🆕 Nova Conversa",
-
-        html: chat.innerHTML
-
-    });
-
-    conversaAtual =
-        conversas.length - 1;
-
-    salvarHistoricoLocal();
-
-    atualizarHistorico();
-
-}
-
-
-// ==================================================
-// ATUALIZAR HISTÓRICO
+// HISTÓRICO VISUAL
 // ==================================================
 
 function atualizarHistorico() {
 
-    if (!listaHistorico) return;
+    if (!listaHistorico)
+        return;
+
 
     listaHistorico.innerHTML = "";
 
-    conversas.forEach((conversa, indice) => {
 
-        const item =
-            document.createElement("div");
+    conversas.forEach(
+        (conversa, indice) => {
 
-        item.className =
-            "itemHistorico";
+            const item =
+                document.createElement("div");
 
-        if (indice === conversaAtual) {
+            item.className =
+                "itemHistorico";
 
-            item.classList.add("ativo");
 
-        }
+            if (
+                indice === conversaAtual
+            ) {
 
-        item.textContent =
-            conversa.titulo;
-
-        item.addEventListener(
-            "click",
-            () => {
-
-                conversaAtual = indice;
-
-                chat.innerHTML =
-                    conversa.html;
-
-                atualizarHistorico();
-
-                chat.scrollTop =
-                    chat.scrollHeight;
+                item.classList.add(
+                    "ativo"
+                );
 
             }
-        );
 
-        listaHistorico.appendChild(item);
 
-    });
+            item.textContent =
+                conversa.titulo;
+
+
+            item.addEventListener(
+                "click",
+                () => {
+
+                    conversaAtual =
+                        indice;
+
+                    chat.innerHTML =
+                        conversa.html;
+
+                    atualizarHistorico();
+
+                    rolarChatParaFinal();
+
+                }
+            );
+
+
+            listaHistorico.appendChild(
+                item
+            );
+
+        }
+    );
 
 }
 
 
 // ==================================================
-// ESCAPAR HTML
+// ATUALIZAR CONVERSA
 // ==================================================
 
-function escaparHTML(texto) {
+function atualizarConversaAtual(
+    titulo = null
+) {
 
-    const div =
-        document.createElement("div");
+    if (conversaAtual < 0)
+        return;
 
-    div.textContent = texto;
-
-    return div.innerHTML;
-
-}
-
-
-// ==================================================
-// ATUALIZAR CONVERSA ATUAL
-// ==================================================
-
-function atualizarConversaAtual(titulo = null) {
-
-    if (conversaAtual < 0) return;
 
     if (titulo) {
 
-        conversas[conversaAtual].titulo =
+        conversas[
+            conversaAtual
+        ].titulo =
             titulo;
 
     }
 
-    conversas[conversaAtual].html =
+
+    conversas[
+        conversaAtual
+    ].html =
         chat.innerHTML;
+
 
     salvarHistoricoLocal();
 
@@ -263,7 +493,7 @@ function atualizarConversaAtual(titulo = null) {
 
 
 // ==================================================
-// ROLAR CHAT PARA O FINAL
+// ROLAR CHAT
 // ==================================================
 
 function rolarChatParaFinal() {
@@ -275,7 +505,7 @@ function rolarChatParaFinal() {
 
 
 // ==================================================
-// CRIAR INDICADOR "PENSANDO"
+// INDICADOR PENSANDO
 // ==================================================
 
 function criarIndicadorPensando() {
@@ -284,28 +514,38 @@ function criarIndicadorPensando() {
         document.createElement("div");
 
     pensando.className =
-        "ia pensando";
+        "ia";
 
     pensando.id =
         "pensando";
 
     pensando.innerHTML = `
 
-        <strong>🤖 Gemini</strong>
+        <div class="cabecalho-ia">
 
-        <br><br>
+            <span class="status-ia"></span>
 
-        <span class="indicador-pensando">
+            <strong>
+                Gemini
+            </strong>
 
-            <span>●</span>
-            <span>●</span>
-            <span>●</span>
+        </div>
 
-            <span class="texto-pensando">
-                Pensando...
+        <div style="margin-top:12px;">
+
+            <span class="indicador-pensando">
+
+                <span>●</span>
+                <span>●</span>
+                <span>●</span>
+
+                <span class="texto-pensando">
+                    Pensando...
+                </span>
+
             </span>
 
-        </span>
+        </div>
 
     `;
 
@@ -315,13 +555,12 @@ function criarIndicadorPensando() {
 
 
 // ==================================================
-// ADICIONAR RESPOSTA DA IA
+// RESPOSTA IA
 // ==================================================
 
-function adicionarRespostaIA(texto) {
-
-    const respostaSegura =
-        escaparHTML(texto);
+function adicionarRespostaIA(
+    texto
+) {
 
     const resposta =
         document.createElement("div");
@@ -329,40 +568,54 @@ function adicionarRespostaIA(texto) {
     resposta.className =
         "ia resposta-ia";
 
+
     resposta.innerHTML = `
 
         <div class="cabecalho-ia">
 
-            <strong>🤖 Gemini</strong>
+            <span class="status-ia"></span>
+
+            <strong>
+                Gemini
+            </strong>
 
         </div>
+
 
         <div class="conteudo-resposta">
 
-            ${respostaSegura}
+            ${formatarResposta(texto)}
 
         </div>
+
 
         <div class="acoes-resposta">
 
             <button
                 type="button"
-                class="botao-copiar"
-                title="Copiar resposta"
-            >
+                class="botao-copiar">
+
                 📋 Copiar
+
             </button>
 
         </div>
 
     `;
 
-    chat.appendChild(resposta);
 
-    const botaoCopiar =
-        resposta.querySelector(".botao-copiar");
+    chat.appendChild(
+        resposta
+    );
 
-    botaoCopiar.addEventListener(
+
+    const copiar =
+        resposta.querySelector(
+            ".botao-copiar"
+        );
+
+
+    copiar.addEventListener(
         "click",
         async () => {
 
@@ -372,13 +625,14 @@ function adicionarRespostaIA(texto) {
                     texto
                 );
 
-                botaoCopiar.innerHTML =
+                copiar.innerHTML =
                     "✅ Copiado!";
+
 
                 setTimeout(
                     () => {
 
-                        botaoCopiar.innerHTML =
+                        copiar.innerHTML =
                             "📋 Copiar";
 
                     },
@@ -387,25 +641,15 @@ function adicionarRespostaIA(texto) {
 
             }
 
+
             catch (erro) {
 
                 console.error(
-                    "Erro ao copiar:",
                     erro
                 );
 
-                botaoCopiar.innerHTML =
-                    "⚠️ Não foi possível copiar";
-
-                setTimeout(
-                    () => {
-
-                        botaoCopiar.innerHTML =
-                            "📋 Copiar";
-
-                    },
-                    1800
-                );
+                copiar.innerHTML =
+                    "⚠️ Erro";
 
             }
 
@@ -416,7 +660,7 @@ function adicionarRespostaIA(texto) {
 
 
 // ==================================================
-// ADICIONAR MENSAGEM DE ERRO
+// ERRO
 // ==================================================
 
 function adicionarMensagemErro() {
@@ -427,39 +671,39 @@ function adicionarMensagemErro() {
     erro.className =
         "ia erro-ia";
 
+
     erro.innerHTML = `
 
-        <strong>⚠️ Não foi possível concluir</strong>
+        <strong>
+            ⚠️ Não foi possível concluir
+        </strong>
 
         <br><br>
 
-        Não consegui conversar com o Gemini
+        O assistente não conseguiu responder
         neste momento.
-
-        <br><br>
-
-        Verifique se o servidor está funcionando
-        e tente novamente.
 
         <br><br>
 
         <button
             type="button"
-            class="botao-tentar-novamente"
-        >
+            class="botao-tentar-novamente">
+
             🔄 Tentar novamente
+
         </button>
 
     `;
 
-    chat.appendChild(erro);
 
-    const botaoTentar =
-        erro.querySelector(
-            ".botao-tentar-novamente"
-        );
+    chat.appendChild(
+        erro
+    );
 
-    botaoTentar.addEventListener(
+
+    erro.querySelector(
+        ".botao-tentar-novamente"
+    ).addEventListener(
         "click",
         () => {
 
@@ -491,27 +735,18 @@ async function enviarMensagem(
         textoAutomatico ||
         mensagem.value.trim();
 
-    if (!texto) return;
+
+    if (!texto)
+        return;
 
 
-    // ==============================================
-    // EVITA ENVIO DUPLICADO
-    // ==============================================
+    if (botao.disabled)
+        return;
 
-    if (botao.disabled) return;
-
-
-    // ==============================================
-    // GUARDA ÚLTIMA MENSAGEM
-    // ==============================================
 
     ultimaMensagem =
         texto;
 
-
-    // ==============================================
-    // SE NÃO EXISTIR CONVERSA
-    // ==============================================
 
     if (conversaAtual === -1) {
 
@@ -520,61 +755,78 @@ async function enviarMensagem(
     }
 
 
-    // ==============================================
+    // ----------------------------------------------
     // MENSAGEM DO USUÁRIO
-    // ==============================================
+    // ----------------------------------------------
 
-    const textoSeguro =
-        escaparHTML(texto);
+    const usuario =
+        document.createElement("div");
 
-    chat.innerHTML += `
+    usuario.className =
+        "usuario";
 
-        <div class="usuario">
 
-            <strong>👤 Você</strong>
+    usuario.innerHTML = `
 
-            <br><br>
+        <strong>
+            👤 Você
+        </strong>
 
-            ${textoSeguro}
+        <br><br>
 
-        </div>
+        ${escaparHTML(texto)}
 
     `;
 
+
+    chat.appendChild(
+        usuario
+    );
+
+
     mensagem.value = "";
+
+    ajustarAlturaTextarea();
 
     rolarChatParaFinal();
 
 
-    // ==============================================
-    // PRIMEIRA MENSAGEM VIRA TÍTULO
-    // ==============================================
+    // ----------------------------------------------
+    // TÍTULO
+    // ----------------------------------------------
 
     let titulo =
         texto.trim();
 
-    if (titulo.length > 30) {
+
+    if (titulo.length > 35) {
 
         titulo =
-            titulo.substring(0, 30) + "...";
+            titulo.substring(0, 35) +
+            "...";
 
     }
+
 
     atualizarConversaAtual(
         "💬 " + titulo
     );
 
 
-    // ==============================================
-    // DESABILITA BOTÃO
-    // ==============================================
+    // ----------------------------------------------
+    // BOTÃO
+    // ----------------------------------------------
 
-    botao.disabled = true;
+    botao.disabled =
+        true;
+
+    botao.innerHTML =
+        "⏳";
 
 
-    // ==============================================
-    // MENSAGEM "PENSANDO"
-    // ==============================================
+    // ----------------------------------------------
+    // PENSANDO
+    // ----------------------------------------------
 
     const pensando =
         criarIndicadorPensando();
@@ -588,37 +840,46 @@ async function enviarMensagem(
 
     try {
 
-        // ==========================================
-        // ENVIA PARA O SERVIDOR
-        // ==========================================
+        // ------------------------------------------
+        // PREPARA HISTÓRICO PARA O GEMINI
+        // ------------------------------------------
+
+        const historico =
+            construirHistoricoParaServidor();
+
+
+        // ------------------------------------------
+        // CHAMADA
+        // ------------------------------------------
 
         const resposta =
             await fetch(
                 "/chat",
                 {
 
-                    method: "POST",
+                    method:
+                        "POST",
 
-                    headers: {
+                    headers:
+                        {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-                        "Content-Type":
-                            "application/json"
+                    body:
+                        JSON.stringify({
 
-                    },
+                            pergunta:
+                                texto,
 
-                    body: JSON.stringify({
+                            historico:
+                                historico
 
-                        pergunta: texto
-
-                    })
+                        })
 
                 }
             );
 
-
-        // ==========================================
-        // VERIFICA RESPOSTA DO SERVIDOR
-        // ==========================================
 
         if (!resposta.ok) {
 
@@ -630,17 +891,9 @@ async function enviarMensagem(
         }
 
 
-        // ==========================================
-        // CONVERTE RESPOSTA PARA JSON
-        // ==========================================
-
         const dados =
             await resposta.json();
 
-
-        // ==========================================
-        // REMOVE "PENSANDO"
-        // ==========================================
 
         if (pensando) {
 
@@ -648,10 +901,6 @@ async function enviarMensagem(
 
         }
 
-
-        // ==========================================
-        // RESPOSTA DA IA
-        // ==========================================
 
         const textoResposta =
             dados.resposta ||
@@ -663,16 +912,7 @@ async function enviarMensagem(
         );
 
 
-        // ==========================================
-        // SALVA CONVERSA
-        // ==========================================
-
         atualizarConversaAtual();
-
-
-        // ==========================================
-        // ROLA CHAT
-        // ==========================================
 
         rolarChatParaFinal();
 
@@ -687,10 +927,6 @@ async function enviarMensagem(
         );
 
 
-        // ==========================================
-        // REMOVE "PENSANDO"
-        // ==========================================
-
         if (pensando) {
 
             pensando.remove();
@@ -698,19 +934,9 @@ async function enviarMensagem(
         }
 
 
-        // ==========================================
-        // MOSTRA ERRO
-        // ==========================================
-
         adicionarMensagemErro();
 
-
-        // ==========================================
-        // SALVA CONVERSA
-        // ==========================================
-
         atualizarConversaAtual();
-
 
         rolarChatParaFinal();
 
@@ -719,11 +945,124 @@ async function enviarMensagem(
 
     finally {
 
-        botao.disabled = false;
+        botao.disabled =
+            false;
+
+        botao.innerHTML =
+            `<span class="texto-enviar">Enviar</span>
+             <span class="icone-enviar">➤</span>`;
 
         mensagem.focus();
 
     }
+
+}
+
+
+// ==================================================
+// CONSTRUIR MEMÓRIA
+// ==================================================
+
+function construirHistoricoParaServidor() {
+
+    if (conversaAtual < 0)
+        return [];
+
+
+    const mensagens =
+        conversas[
+            conversaAtual
+        ].mensagens || [];
+
+
+    return mensagens
+        .slice(-12)
+        .map((item) => ({
+
+            role:
+                item.role,
+
+            text:
+                item.text
+
+        }));
+
+}
+
+
+// ==================================================
+// SALVAR MENSAGENS NA MEMÓRIA
+// ==================================================
+
+function salvarMensagemNaMemoria(
+    role,
+    text
+) {
+
+    if (conversaAtual < 0)
+        return;
+
+
+    if (
+        !conversas[
+            conversaAtual
+        ].mensagens
+    ) {
+
+        conversas[
+            conversaAtual
+        ].mensagens = [];
+
+    }
+
+
+    conversas[
+        conversaAtual
+    ].mensagens.push({
+
+        role:
+            role,
+
+        text:
+            text
+
+    });
+
+
+    // Limita memória local
+
+    if (
+        conversas[
+            conversaAtual
+        ].mensagens.length > 20
+    ) {
+
+        conversas[
+            conversaAtual
+        ].mensagens =
+            conversas[
+                conversaAtual
+            ].mensagens.slice(-20);
+
+    }
+
+}
+
+
+// ==================================================
+// AJUSTAR TEXTAREA
+// ==================================================
+
+function ajustarAlturaTextarea() {
+
+    mensagem.style.height =
+        "auto";
+
+    mensagem.style.height =
+        Math.min(
+            mensagem.scrollHeight,
+            130
+        ) + "px";
 
 }
 
@@ -743,7 +1082,7 @@ botao.addEventListener(
 
 
 // ==================================================
-// ENTER PARA ENVIAR
+// ENTER
 // ==================================================
 
 mensagem.addEventListener(
@@ -765,12 +1104,123 @@ mensagem.addEventListener(
 );
 
 
+mensagem.addEventListener(
+    "input",
+    ajustarAlturaTextarea
+);
+
+
 // ==================================================
-// ATALHOS
+// ATALHOS INTELIGENTES
 // ==================================================
 
 const atalhos =
-    document.querySelectorAll(".atalho");
+    document.querySelectorAll(
+        ".atalho"
+    );
+
+
+const prompts = {
+
+    swot:
+        `Quero fazer uma Análise SWOT completa para minha empresa.
+
+Faça a análise considerando:
+- Forças
+- Fraquezas
+- Oportunidades
+- Ameaças
+
+Depois apresente recomendações estratégicas.
+
+Antes de começar, faça as perguntas necessárias para entender minha empresa.`,
+
+    persona:
+        `Quero criar uma persona completa para minha empresa.
+
+Considere:
+- Nome fictício
+- Idade
+- Profissão
+- Renda
+- Objetivos
+- Dores
+- Necessidades
+- Hábitos
+- Comportamento de compra
+- Redes sociais
+- Motivações
+
+Antes de criar, faça as perguntas necessárias para conhecer meu público.`,
+
+    plano:
+        `Quero criar um Plano de Marketing profissional para minha empresa.
+
+Inclua:
+- Diagnóstico
+- Objetivos
+- Público-alvo
+- Posicionamento
+- Estratégias
+- Canais
+- Conteúdo
+- Cronograma
+- Orçamento sugerido
+- KPIs
+
+Primeiro faça as perguntas necessárias para entender meu negócio.`,
+
+    redes:
+        `Quero criar uma estratégia completa de Redes Sociais para minha empresa.
+
+Analise:
+- Instagram
+- Facebook
+- TikTok
+- LinkedIn
+
+Defina:
+- Objetivos
+- Público
+- Pilares de conteúdo
+- Frequência
+- Formatos
+- Ideias de posts
+- Estratégias de crescimento
+
+Primeiro faça as perguntas necessárias.`,
+
+    calendario:
+        `Quero criar um calendário de conteúdo de 30 dias para minha empresa.
+
+Para cada dia indique:
+- Tema
+- Formato
+- Ideia
+- Objetivo
+- CTA
+
+Antes de criar o calendário, faça as perguntas necessárias sobre minha empresa e meu público.`,
+
+    campanha:
+        `Quero criar uma campanha de marketing profissional.
+
+Desenvolva:
+- Nome da campanha
+- Conceito
+- Objetivo
+- Público-alvo
+- Oferta
+- Mensagem principal
+- Canais
+- Conteúdos
+- Cronograma
+- CTA
+- KPIs
+
+Primeiro faça as perguntas necessárias para entender o negócio.`
+
+};
 
 
 atalhos.forEach(
@@ -780,68 +1230,19 @@ atalhos.forEach(
             "click",
             () => {
 
-                let prompt = "";
+                const tipo =
+                    atalho.dataset.tipo;
 
-
-                switch (
-                    atalho.innerText.trim()
+                if (
+                    prompts[tipo]
                 ) {
 
-                    case "📊 Análise SWOT":
+                    mensagem.value =
+                        prompts[tipo];
 
-                        prompt =
-                            "Crie uma análise SWOT completa para uma empresa. Explique forças, fraquezas, oportunidades e ameaças.";
+                    ajustarAlturaTextarea();
 
-                        break;
-
-
-                    case "👤 Criar Persona":
-
-                        prompt =
-                            "Crie uma persona completa para uma empresa, incluindo nome fictício, idade, profissão, objetivos, dores, necessidades, hábitos de consumo e canais de comunicação.";
-
-                        break;
-
-
-                    case "📈 Plano de Marketing":
-
-                        prompt =
-                            "Crie um plano de marketing completo para uma empresa, incluindo objetivos, público-alvo, estratégias, canais, ações e indicadores de desempenho.";
-
-                        break;
-
-
-                    case "📱 Redes Sociais":
-
-                        prompt =
-                            "Crie uma estratégia de marketing para Instagram, Facebook, LinkedIn e TikTok, indicando tipos de conteúdo, frequência e objetivos.";
-
-                        break;
-
-
-                    case "📅 Calendário":
-
-                        prompt =
-                            "Monte um calendário de conteúdo para 30 dias para uma empresa, com ideias de posts, formatos, temas e objetivos.";
-
-                        break;
-
-
-                    case "🎯 Campanha":
-
-                        prompt =
-                            "Crie uma campanha completa de marketing, incluindo nome da campanha, objetivo, público-alvo, conceito, canais, conteúdos, cronograma e indicadores.";
-
-                        break;
-
-                }
-
-
-                if (prompt) {
-
-                    enviarMensagem(
-                        prompt
-                    );
+                    mensagem.focus();
 
                 }
 
@@ -853,34 +1254,60 @@ atalhos.forEach(
 
 
 // ==================================================
-// NOVA CONVERSA - BOTÃO SUPERIOR
+// NOVA CONVERSA
 // ==================================================
+
+function nova() {
+
+    iniciarNovaConversa();
+
+    rolarChatParaFinal();
+
+    mensagem.focus();
+
+}
+
 
 novaConversa.addEventListener(
     "click",
-    () => {
-
-        iniciarNovaConversa();
-
-        chat.scrollTop = 0;
-
-        mensagem.focus();
-
-    }
+    nova
 );
 
-
-// ==================================================
-// NOVA CONVERSA - BOTÃO LATERAL
-// ==================================================
 
 novaConversaLateral.addEventListener(
     "click",
+    nova
+);
+
+
+// ==================================================
+// LIMPAR HISTÓRICO
+// ==================================================
+
+limparHistorico.addEventListener(
+    "click",
     () => {
 
-        iniciarNovaConversa();
+        const confirmar =
+            confirm(
+                "Tem certeza que deseja apagar todo o histórico?"
+            );
 
-        chat.scrollTop = 0;
+
+        if (!confirmar)
+            return;
+
+
+        localStorage.removeItem(
+            "marketingConversas"
+        );
+
+
+        conversas = [];
+
+        conversaAtual = -1;
+
+        iniciarNovaConversa();
 
         mensagem.focus();
 
@@ -889,13 +1316,16 @@ novaConversaLateral.addEventListener(
 
 
 // ==================================================
-// MODO ESCURO
+// TEMA
 // ==================================================
 
 function carregarTema() {
 
     const tema =
-        localStorage.getItem("tema");
+        localStorage.getItem(
+            "tema"
+        );
+
 
     if (tema === "escuro") {
 
@@ -923,11 +1353,13 @@ modoEscuro.addEventListener(
         );
 
 
-        if (
+        const escuro =
             document.body.classList.contains(
                 "dark"
-            )
-        ) {
+            );
+
+
+        if (escuro) {
 
             modoEscuro.innerHTML =
                 "☀️ Modo Claro";
@@ -956,7 +1388,7 @@ modoEscuro.addEventListener(
 
 
 // ==================================================
-// EXPORTAR PDF
+// PDF
 // ==================================================
 
 botaoPDF.addEventListener(
@@ -969,7 +1401,7 @@ botaoPDF.addEventListener(
         ) {
 
             alert(
-                "A biblioteca do PDF ainda não carregou. Atualize a página e tente novamente."
+                "A biblioteca PDF ainda não carregou. Atualize a página."
             );
 
             return;
@@ -979,23 +1411,23 @@ botaoPDF.addEventListener(
 
         const {
             jsPDF
-        } = window.jspdf;
+        } =
+            window.jspdf;
 
 
         const pdf =
             new jsPDF();
 
 
-        // ==========================================
-        // TÍTULO
-        // ==========================================
-
         pdf.setFont(
             "helvetica",
             "bold"
         );
 
-        pdf.setFontSize(18);
+        pdf.setFontSize(
+            18
+        );
+
 
         pdf.text(
             "MARKETING IA ASSISTENTE",
@@ -1009,7 +1441,10 @@ botaoPDF.addEventListener(
             "normal"
         );
 
-        pdf.setFontSize(10);
+        pdf.setFontSize(
+            10
+        );
+
 
         pdf.text(
             "Inteligência Artificial para criar estratégias de marketing",
@@ -1026,10 +1461,6 @@ botaoPDF.addEventListener(
         );
 
 
-        // ==========================================
-        // CONVERSA
-        // ==========================================
-
         const conversa =
             chat.innerText;
 
@@ -1041,9 +1472,8 @@ botaoPDF.addEventListener(
             );
 
 
-        let y = 44;
-
-        pdf.setFontSize(10);
+        let y =
+            44;
 
 
         linhas.forEach(
@@ -1064,45 +1494,24 @@ botaoPDF.addEventListener(
                     y
                 );
 
+
                 y += 5;
 
             }
         );
 
 
-        // ==========================================
-        // DATA
-        // ==========================================
-
-        const agora =
-            new Date();
-
-
-        const data =
-            agora.toLocaleDateString(
-                "pt-BR"
-            )
-            +
-            " "
-            +
-            agora.toLocaleTimeString(
-                "pt-BR"
-            );
-
-
-        pdf.setFontSize(8);
+        pdf.setFontSize(
+            8
+        );
 
 
         pdf.text(
-            "Gerado em: " + data,
+            "MARKETING IA ASSISTENTE",
             20,
             290
         );
 
-
-        // ==========================================
-        // SALVAR
-        // ==========================================
 
         pdf.save(
             "Marketing_IA_Assistente.pdf"
@@ -1113,9 +1522,73 @@ botaoPDF.addEventListener(
 
 
 // ==================================================
-// INICIAR SISTEMA
+// INTERCEPTAR MEMÓRIA
+// ==================================================
+
+// Guarda a pergunta antes do envio.
+const enviarMensagemOriginal =
+    enviarMensagem;
+
+
+// Sobrescreve para registrar pergunta/resposta.
+enviarMensagem =
+    async function(textoAutomatico = null) {
+
+        const texto =
+            textoAutomatico ||
+            mensagem.value.trim();
+
+
+        if (!texto)
+            return;
+
+
+        salvarMensagemNaMemoria(
+            "user",
+            texto
+        );
+
+
+        try {
+
+            await enviarMensagemOriginal(
+                texto
+            );
+
+        }
+
+
+        catch (erro) {
+
+            console.error(
+                erro
+            );
+
+        }
+
+    };
+
+
+// ==================================================
+// AJUSTE DA RESPOSTA NA MEMÓRIA
+// ==================================================
+
+const adicionarRespostaIAOriginal =
+    adicionarRespostaIA;
+
+
+// Não altera a interface.
+// O servidor recebe o histórico do usuário.
+// A próxima versão pode ampliar a memória,
+// mantendo a aplicação leve.
+
+
+// ==================================================
+// INICIAR
 // ==================================================
 
 carregarHistorico();
 
 mensagem.focus();
+
+ajustarAlturaTextarea();
